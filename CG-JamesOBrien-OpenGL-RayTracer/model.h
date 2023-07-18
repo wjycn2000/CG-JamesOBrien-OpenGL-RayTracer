@@ -22,6 +22,16 @@
 #include "raytrace.h"
 using namespace std;
 
+struct Material {
+    glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+    float kd = 0.75f;
+    float ks = 0.25f;
+    float shine = 3.5f;
+    float km = 0.25f;
+    float t = 0.0f;
+    float ior = 1.0f;
+};
+
 class Model
 {
 public:
@@ -65,7 +75,6 @@ private:
             cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
             return;
         }
-
 
         // process ASSIMP's root node recursively
         processNode(scene->mRootNode, scene);
@@ -130,5 +139,13 @@ private:
 
         return Mesh(vertices, indices);
     }
+};
+
+class Object {
+public:
+    Model* model;
+    glm::vec3 position;
+    glm::vec3 rotation;
+    glm::vec3 scale;
 };
 #endif
