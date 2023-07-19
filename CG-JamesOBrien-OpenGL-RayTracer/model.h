@@ -30,6 +30,17 @@ struct Material {
     float km = 0.25f;
     float t = 0.0f;
     float ior = 1.0f;
+    Material() {}
+    Material(glm::vec3 _color, float _kd, float _ks, float _shine,
+        float _km, float _t, float _ior) {
+        color = _color;
+        kd = _kd;
+        ks = _ks;
+        shine = _shine;
+        km = _km;
+        t = _t;
+        ior = _ior;
+    }
 };
 
 class Model
@@ -38,15 +49,18 @@ public:
     // model data 
     vector<Mesh> meshes;
     Material material;
+    unsigned int numT;
 
     // constructor, expects a filepath to a 3D model.
     Model(string const& path, Material m)
     {
         loadModel(path);
         material = m;
+        numT = 0;
     }
 
     void genTriangles(vector<Triangle>& triangles) {
+        unsigned int numTStart = triangles.size();
         for (unsigned int i = 0; i < meshes.size(); i++) {
             Mesh* mesh = &meshes[i];
             for (unsigned int j = 0; j < mesh->indices.size()-2; j=j+3) {
@@ -60,6 +74,7 @@ public:
                 triangles.push_back(t);
             }
         }
+        numT = triangles.size() - numTStart;
     }
 
 private:
@@ -147,5 +162,12 @@ public:
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
+
+    Object(Model* _model, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale) {
+        model = _model;
+        position = _position;
+        rotation = _rotation;
+        scale = _scale;
+    }
 };
 #endif

@@ -8,6 +8,7 @@ struct Triangle {
 };
 
 struct Object_encoded {
+	glm::vec3 numT; //index, numT, empty
 	glm::vec3 position;
 	glm::vec3 rotation;
 	glm::vec3 scale;
