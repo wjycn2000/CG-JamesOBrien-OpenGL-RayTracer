@@ -7,7 +7,7 @@
 
 #include <learnopengl/shader_s.h>
 #include <learnopengl/CameraFPS.h>
-#include "model.h"
+#include "scene.h"
 #include "raytrace.h"
 #include <Windows.h>
 
@@ -32,12 +32,51 @@ float deltaTime = 0.0f; // 当前帧与上一帧的时间差
 float lastFrame = 0.0f; // 上一帧的时间
 
 
-glm::vec3 eye(0.0f, 0.5f, 8.0f);
+glm::vec3 eye(0.0f, 0.0f, 8.0f);
 glm::vec3 at(0.0f, 0.0f, 0.0f);
 glm::vec3 up(0.0f, 1.0f, 0.0f);
 
 int main()
 {
+    Scene scene;
+    Material m1(glm::vec3(0.9f, 0.3f, 0.1f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
+    Material m2(glm::vec3(0.9f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
+    Model model1("D:\\3DResources\\chorus.obj");
+    Model model2("D:\\3DResources\\plane.obj");
+    Object chorus1(&model1, m1, glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+    Object chorus2(&model1, m2, glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+    Object plane1(&model2, m1, glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(2.0f));
+    Light pointLight(glm::vec3(-5.0f, 5.0f, 5.0f));
+    Light pointLight2(glm::vec3(5.0f, 5.0f, 5.0f));
+    scene.addObject(chorus1);
+    scene.addObject(chorus2);
+    //scene.addObject(plane1);
+    scene.addLight(pointLight);
+    //scene.addLight(pointLight2);
+    vector<Triangle> ttt;
+    vector<Object_encoded> ooo;
+    vector<Light> lll;
+    scene.generateData(ttt, ooo, lll);
+
+    /*for (Triangle t : ttt) {
+        cout << "f" << endl;
+        cout << "p1: " << t.p1.x << " " << t.p1.y << " " << t.p1.z << endl;
+        cout << "p2: " << t.p2.x << " " << t.p2.y << " " << t.p2.z << endl;
+        cout << "p3: " << t.p3.x << " " << t.p3.y << " " << t.p3.z << endl;
+    }
+
+    for (Object_encoded o : ooo) {
+        cout << "numT: " << o.numT.x << " " << o.numT.y << " " << o.numT.z << endl;
+        cout << "color: " << o.color.x << " " << o.color.y << " " << o.color.z << endl;
+    }
+
+    for (Light l : lll) {
+        cout << "position: " << l.position.x << " " << l.position.y << " " << l.position.z << endl;
+        cout << "color: " << l.color.x << " " << l.color.y << " " << l.color.z << endl;
+    }
+
+    return 0;*/
+
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -81,16 +120,11 @@ int main()
         1, -1, 0
     };
 
-    Material m;
-    Model model("D:\\3DResources\\scene1.obj", m);
-    vector<Triangle> ts;
-    model.genTriangles(ts);
 
     glm::vec3 bcolor(0.5f, 0.5f, 0.5f);
     glm::vec3 light1(-10, 10, 10);
     glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-    glm::vec3 color = m.color;
-    float shadowbias = 0.00001f;
+    float shadowbias = 0.0001f;
     float angle = 60.0f;
     float hither = 1.0f;
 
@@ -105,21 +139,39 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    GLuint tbo;
-    glGenBuffers(1, &tbo);
-    glBindBuffer(GL_TEXTURE_BUFFER, tbo);
-    glBufferData(GL_TEXTURE_BUFFER, ts.size() * sizeof(Triangle), &ts[0], GL_STATIC_DRAW);
-    GLuint tex;
-    glGenTextures(1, &tex);
+    GLuint tbo_t, tbo_o, tbo_l;
+    glGenBuffers(1, &tbo_t);
+    glBindBuffer(GL_TEXTURE_BUFFER, tbo_t);
+    glBufferData(GL_TEXTURE_BUFFER, ttt.size() * sizeof(Triangle), &ttt[0], GL_STATIC_DRAW);
+    glGenBuffers(1, &tbo_o);
+    glBindBuffer(GL_TEXTURE_BUFFER, tbo_o);
+    glBufferData(GL_TEXTURE_BUFFER, ooo.size() * sizeof(Object_encoded), &ooo[0], GL_STATIC_DRAW);
+    glGenBuffers(1, &tbo_l);
+    glBindBuffer(GL_TEXTURE_BUFFER, tbo_l);
+    glBufferData(GL_TEXTURE_BUFFER, lll.size() * sizeof(Light), &lll[0], GL_STATIC_DRAW);
+
+    GLuint tex_t, tex_o, tex_l;
+    glGenTextures(1, &tex_t);
+    glGenTextures(1, &tex_o);
+    glGenTextures(1, &tex_l);
     
 
     // build and compile shader program
     Shader shader("D:\\OpenGL\\shaders\\raytracing.vs", "D:\\OpenGL\\shaders\\raytracing.fs");
     shader.use();
+    shader.setInt("triangles", 0);
+    shader.setInt("objects", 1);
+    shader.setInt("lights", 2);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_BUFFER, tex);
-    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, tbo);
+    glBindTexture(GL_TEXTURE_BUFFER, tex_t);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, tbo_t);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_BUFFER, tex_o);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, tbo_o);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_BUFFER, tex_l);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, tbo_l);
     
 
     
@@ -151,9 +203,6 @@ int main()
         
 
         shader.use();
-        shader.setFloat3("material1", color.x, color.y, color.z);
-        shader.setFloat3("material2", m.kd, m.ks, m.shine);
-        shader.setFloat3("material3", m.km, m.t, m.ior);
         shader.setInt2("resolution", SCR_WIDTH, SCR_HEIGHT);
         shader.setFloat3("eye", eye.x, eye.y, eye.z);
         shader.setFloat3("up", up.x, up.y, up.z);
@@ -162,9 +211,9 @@ int main()
         shader.setFloat("shadowbias", shadowbias);
         shader.setFloat("hither", hither);
         shader.setFloat3("bcolor", bcolor.x, bcolor.y, bcolor.z);
-        shader.setInt("triangleNum", ts.size());
-        shader.setFloat3("light1", light1.x, light1.y, light1.z);
-        shader.setFloat3("lightColor", lightColor.x, lightColor.y, lightColor.z);
+        shader.setInt("triangleNum", ttt.size());
+        shader.setInt("objectNum", ooo.size());
+        shader.setInt("lightNum", lll.size());
         
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
