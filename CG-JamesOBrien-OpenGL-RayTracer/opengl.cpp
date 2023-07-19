@@ -43,8 +43,8 @@ int main()
     Material m2(glm::vec3(0.9f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
     Model model1("D:\\3DResources\\chorus.obj");
     Model model2("D:\\3DResources\\plane.obj");
-    Object chorus1(&model1, m1, glm::vec3(-3.0f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f));
-    Object chorus2(&model1, m2, glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+    Object chorus1(&model1, m1, glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+    Object chorus2(&model1, m2, glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
     Object plane1(&model2, m1, glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(2.0f));
     Light pointLight(glm::vec3(-5.0f, 5.0f, 5.0f));
     Light pointLight2(glm::vec3(5.0f, 5.0f, 5.0f));
@@ -58,24 +58,24 @@ int main()
     vector<Light> lll;
     scene.generateData(ttt, ooo, lll);
 
-    //for (Triangle t : ttt) {
-    //    cout << "f" << endl;
-    //    cout << "p1: " << t.p1.x << " " << t.p1.y << " " << t.p1.z << endl;
-    //    cout << "p2: " << t.p2.x << " " << t.p2.y << " " << t.p2.z << endl;
-    //    cout << "p3: " << t.p3.x << " " << t.p3.y << " " << t.p3.z << endl;
-    //}
+    /*for (Triangle t : ttt) {
+        cout << "f" << endl;
+        cout << "p1: " << t.p1.x << " " << t.p1.y << " " << t.p1.z << endl;
+        cout << "p2: " << t.p2.x << " " << t.p2.y << " " << t.p2.z << endl;
+        cout << "p3: " << t.p3.x << " " << t.p3.y << " " << t.p3.z << endl;
+    }
 
-    //for (Object_encoded o : ooo) {
-    //    cout << "numT: " << o.numT.x << " " << o.numT.y << " " << o.numT.z << endl;
-    //    cout << "color: " << o.color.x << " " << o.color.y << " " << o.color.z << endl;
-    //}
+    for (Object_encoded o : ooo) {
+        cout << "numT: " << o.numT.x << " " << o.numT.y << " " << o.numT.z << endl;
+        cout << "color: " << o.color.x << " " << o.color.y << " " << o.color.z << endl;
+    }
 
-    //for (Light l : lll) {
-    //    cout << "position: " << l.position.x << " " << l.position.y << " " << l.position.z << endl;
-    //    cout << "color: " << l.color.x << " " << l.color.y << " " << l.color.z << endl;
-    //}
+    for (Light l : lll) {
+        cout << "position: " << l.position.x << " " << l.position.y << " " << l.position.z << endl;
+        cout << "color: " << l.color.x << " " << l.color.y << " " << l.color.z << endl;
+    }
 
-    /*return 0;*/
+    return 0;*/
 
     // glfw: initialize and configure
     // ------------------------------
