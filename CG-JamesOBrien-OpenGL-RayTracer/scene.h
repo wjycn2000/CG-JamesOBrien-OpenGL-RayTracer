@@ -36,7 +36,7 @@ public:
 			o.position = objects[i].position;
 			o.rotation = objects[i].rotation;
 			o.scale = objects[i].scale;
-			Material m = objects[i].model->material;
+			Material m = objects[i].material;
 			o.color = m.color;
 			o.param1 = glm::vec3(m.kd, m.ks, m.shine);
 			o.param2 = glm::vec3(m.km, m.t, m.ior);

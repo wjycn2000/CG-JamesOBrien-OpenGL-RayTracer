@@ -41,11 +41,11 @@ int main()
     Scene scene;
     Material m1(glm::vec3(0.9f, 0.3f, 0.1f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
     Material m2(glm::vec3(0.9f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
-    Model model1("D:\\3DResources\\chorus.obj", m1);
-    Model model2("D:\\3DResources\\plane.obj", m2);
-    Object chorus1(&model1, glm::vec3(-3.0f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f));
-    Object chorus2(&model1, glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
-    Object plane1(&model2, glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(2.0f));
+    Model model1("D:\\3DResources\\chorus.obj");
+    Model model2("D:\\3DResources\\plane.obj");
+    Object chorus1(&model1, m1, glm::vec3(-3.0f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+    Object chorus2(&model1, m2, glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+    Object plane1(&model2, m1, glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(2.0f));
     Light pointLight(glm::vec3(-5.0f, 5.0f, 5.0f));
     Light pointLight2(glm::vec3(5.0f, 5.0f, 5.0f));
     scene.addObject(chorus1);
@@ -121,15 +121,9 @@ int main()
     };
 
 
-    Material m;
-    Model model("D:\\3DResources\\scene1.obj", m);
-    vector<Triangle> ts;
-    model.genTriangles(ts);
-
     glm::vec3 bcolor(0.5f, 0.5f, 0.5f);
     glm::vec3 light1(-10, 10, 10);
     glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
-    glm::vec3 color = m.color;
     float shadowbias = 0.0001f;
     float angle = 60.0f;
     float hither = 1.0f;

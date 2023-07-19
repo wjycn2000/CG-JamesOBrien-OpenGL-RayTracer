@@ -48,14 +48,13 @@ class Model
 public:
     // model data 
     vector<Mesh> meshes;
-    Material material;
+
     unsigned int numT;
 
     // constructor, expects a filepath to a 3D model.
-    Model(string const& path, Material m)
+    Model(string const& path)
     {
         loadModel(path);
-        material = m;
         numT = 0;
     }
 
@@ -162,12 +161,14 @@ public:
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
+    Material material;
 
-    Object(Model* _model, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale) {
+    Object(Model* _model, Material _m, glm::vec3 _position, glm::vec3 _rotation, glm::vec3 _scale) {
         model = _model;
         position = _position;
         rotation = _rotation;
         scale = _scale;
+        material = _m;
     }
 };
 #endif
