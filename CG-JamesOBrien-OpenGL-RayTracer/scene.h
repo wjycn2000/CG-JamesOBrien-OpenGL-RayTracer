@@ -17,6 +17,7 @@ class Scene {
 public:
 	std::vector<Object> objects;
 	std::vector<Light> lights;
+	std::vector<Model*> models;
 	Scene() {}
 
 	void addObject(Object o) {
@@ -28,20 +29,34 @@ public:
 	}
 
 	void generateData(std::vector<Triangle>& triangles, std::vector<Object_encoded>& os, std::vector<Light>& _lights) {
-		Object_encoded o;
+		//add models
 		for (unsigned int i = 0; i < objects.size(); i++) {
-			o.numT.x = triangles.size();
-			objects[i].model->genTriangles(triangles);
+			auto iter = std::find(models.begin(), models.end(), objects[i].model);
+			if (iter == models.end()) {
+				models.push_back(objects[i].model);
+			}
 
-			o.position = objects[i].position;
-			o.rotation = objects[i].rotation;
-			o.scale = objects[i].scale;
-			Material m = objects[i].material;
-			o.color = m.color;
-			o.param1 = glm::vec3(m.kd, m.ks, m.shine);
-			o.param2 = glm::vec3(m.km, m.t, m.ior);
-			o.numT.y = (float)objects[i].model->numT;
-			os.push_back(o);
+		}
+		int index = 0;
+		for (unsigned int i = 0; i < models.size(); i++) {
+			Model* model = models[i];
+			model->genTriangles(triangles);
+			for (unsigned int j = 0; j < model->objects.size(); j++) {
+				Object_encoded o;
+
+				o.numT.x = index;
+				o.numT.y = triangles.size() - index;
+
+				o.position = model->objects[j]->position;
+				o.rotation = model->objects[j]->rotation;
+				o.scale = model->objects[j]->scale;
+				Material m = model->objects[j]->material;
+				o.color = m.color;
+				o.param1 = glm::vec3(m.kd, m.ks, m.shine);
+				o.param2 = glm::vec3(m.km, m.t, m.ior);
+				os.push_back(o);
+			}
+			index = triangles.size();
 		}
 		_lights = lights;
 	}

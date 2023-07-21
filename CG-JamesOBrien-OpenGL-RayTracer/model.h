@@ -42,13 +42,14 @@ struct Material {
         ior = _ior;
     }
 };
+class Object;
 
 class Model
 {
 public:
     // model data 
     vector<Mesh> meshes;
-
+    vector<Object*> objects;
     unsigned int numT;
 
     // constructor, expects a filepath to a 3D model.
@@ -169,6 +170,7 @@ public:
         rotation = _rotation;
         scale = _scale;
         material = _m;
+        model->objects.push_back(this);
     }
 };
 #endif

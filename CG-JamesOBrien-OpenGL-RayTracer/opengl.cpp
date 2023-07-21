@@ -45,12 +45,10 @@ int main()
     Model model2("D:\\3DResources\\plane.obj");
     Object chorus1(&model1, m1, glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f));
     Object chorus2(&model1, m2, glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
-    Object plane1(&model2, m1, glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(2.0f));
     Light pointLight(glm::vec3(-5.0f, 5.0f, 5.0f));
     Light pointLight2(glm::vec3(5.0f, 5.0f, 5.0f));
     scene.addObject(chorus1);
     scene.addObject(chorus2);
-    //scene.addObject(plane1);
     scene.addLight(pointLight);
     //scene.addLight(pointLight2);
     vector<Triangle> ttt;
@@ -58,22 +56,27 @@ int main()
     vector<Light> lll;
     scene.generateData(ttt, ooo, lll);
 
-    /*for (Triangle t : ttt) {
-        cout << "f" << endl;
+    /*int x = 0;
+    for (Triangle t : ttt) {
+        cout << x++ << endl;
         cout << "p1: " << t.p1.x << " " << t.p1.y << " " << t.p1.z << endl;
         cout << "p2: " << t.p2.x << " " << t.p2.y << " " << t.p2.z << endl;
         cout << "p3: " << t.p3.x << " " << t.p3.y << " " << t.p3.z << endl;
     }
 
+    int y = 0;
     for (Object_encoded o : ooo) {
+        cout << y++ << endl;
         cout << "numT: " << o.numT.x << " " << o.numT.y << " " << o.numT.z << endl;
         cout << "color: " << o.color.x << " " << o.color.y << " " << o.color.z << endl;
+        cout << "position: " << o.position.x << " " << o.position.y << " " << o.position.z << endl;
     }
 
     for (Light l : lll) {
         cout << "position: " << l.position.x << " " << l.position.y << " " << l.position.z << endl;
         cout << "color: " << l.color.x << " " << l.color.y << " " << l.color.z << endl;
     }
+    cout << ooo.size() << endl;
 
     return 0;*/
 
@@ -157,7 +160,7 @@ int main()
     
 
     // build and compile shader program
-    Shader shader("D:\\OpenGL\\shaders\\raytracing.vs", "D:\\OpenGL\\shaders\\raytracing.fs");
+    Shader shader("raytracing.vert", "raytracing.frag");
     shader.use();
     shader.setInt("triangles", 0);
     shader.setInt("objects", 1);
