@@ -86,44 +86,45 @@ public:
         //initialize
         bvhnodes[index].left = bvhnodes[index].right = -1;
         bvhnodes[index].n = bvhnodes[index].index = -1;
+        bvhnodes[index].AA = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
+        bvhnodes[index].BB = glm::vec3(INFINITY, INFINITY, INFINITY);
 
         //compute AABB
         GLfloat minx = INFINITY, maxx = -INFINITY, miny = INFINITY, maxy=-INFINITY, minz=INFINITY, maxz=-INFINITY;
-        int minxt, maxxt, minyt, maxyt, minzt, maxzt;
         for (unsigned int i = l; i <= r; i++) {
             glm::vec3 p1 = triangles[i].p1;
             glm::vec3 p2 = triangles[i].p2;
             glm::vec3 p3 = triangles[i].p3;
 
             //minx
-            if (p1.x < minx) minx = p1.x, minxt = i;
-            if (p2.x < minx) minx = p2.x, minxt = i;
-            if (p3.x < minx) minx = p3.x, minxt = i;
+            if (p1.x < minx) minx = p1.x;
+            if (p2.x < minx) minx = p2.x;
+            if (p3.x < minx) minx = p3.x;
 
             //maxx
-            if (p1.x > maxx) maxx = p1.x, maxxt = i;
-            if (p2.x > maxx) maxx = p2.x, maxxt = i;
-            if (p3.x > maxx) maxx = p3.x, maxxt = i;
+            if (p1.x > maxx) maxx = p1.x;
+            if (p2.x > maxx) maxx = p2.x;
+            if (p3.x > maxx) maxx = p3.x;
 
             //miny
-            if (p1.y < miny) miny = p1.y, minyt = i;
-            if (p2.y < miny) miny = p2.y, minyt = i;
-            if (p3.y < miny) miny = p3.y, minyt = i;
+            if (p1.y < miny) miny = p1.y;
+            if (p2.y < miny) miny = p2.y;
+            if (p3.y < miny) miny = p3.y;
 
             //maxy
-            if (p1.y > maxy) maxy = p1.y, maxyt = i;
-            if (p2.y > maxy) maxy = p2.y, maxyt = i;
-            if (p3.y > maxy) maxy = p3.y, maxyt = i;
+            if (p1.y > maxy) maxy = p1.y;
+            if (p2.y > maxy) maxy = p2.y;
+            if (p3.y > maxy) maxy = p3.y;
 
             //minz
-            if (p1.z < minz) minz = p1.z, minzt = i;
-            if (p2.z < minz) minz = p2.z, minzt = i;
-            if (p3.z < minz) minz = p3.z, minzt = i;
+            if (p1.z < minz) minz = p1.z;
+            if (p2.z < minz) minz = p2.z;
+            if (p3.z < minz) minz = p3.z;
 
             //maxz
-            if (p1.z > maxz) maxz = p1.z, maxzt = i;
-            if (p2.z > maxz) maxz = p2.z, maxzt = i;
-            if (p3.z > maxz) maxz = p3.z, maxzt = i;
+            if (p1.z > maxz) maxz = p1.z;
+            if (p2.z > maxz) maxz = p2.z;
+            if (p3.z > maxz) maxz = p3.z;
         }
         bvhnodes[index].AA = glm::vec3(minx, miny, minz);
         bvhnodes[index].BB = glm::vec3(maxx, maxy, maxz);

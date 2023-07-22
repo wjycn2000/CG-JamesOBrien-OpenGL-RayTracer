@@ -34,7 +34,7 @@ void encodeBVH(const BVHnode& node1, BVHnode_encoded& node2) {
 	node2.children = glm::vec3(node1.left, node1.right, 0);
 	node2.triangles = glm::vec3(node1.index, node1.n, 0);
 	node2.AA = node1.AA;
-	node2.BB = node2.BB;
+	node2.BB = node1.BB;
 }
 
 void converTree(vector<BVHnode>& tree1, vector<BVHnode_encoded>& tree2) {

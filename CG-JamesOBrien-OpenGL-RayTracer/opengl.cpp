@@ -42,17 +42,17 @@ int main()
     Material m1(glm::vec3(0.9f, 0.3f, 0.1f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
     Material m2(glm::vec3(0.9f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
     Model model1("D:\\3DResources\\chorus.obj");
-    Model model2("D:\\3DResources\\plane.obj");
-    Object chorus1(&model1, m1, glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f));
-    Object chorus2(&model1, m2, glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
-    Object plane(&model1, m2, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(2.0f));
-    Object plane2(&model2, m2, glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(2.0f));
+    //Model model2("D:\\3DResources\\plane.obj");
+    Object chorus1(&model1, m1, glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    Object chorus2(&model1, m2, glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    //Object plane(&model1, m2, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(2.0f));
+    //Object plane2(&model2, m2, glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(2.0f));
     Light pointLight(glm::vec3(-5.0f, 5.0f, 5.0f));
-    Light pointLight2(glm::vec3(5.0f, 5.0f, 5.0f));
+    //Light pointLight2(glm::vec3(5.0f, 5.0f, 5.0f));
     scene.addObject(chorus1);
     scene.addObject(chorus2);
-    scene.addObject(plane);
-    scene.addObject(plane2);
+    //scene.addObject(plane);
+    //scene.addObject(plane2);
     scene.addLight(pointLight);
     //scene.addLight(pointLight2);
     vector<Triangle> ttt;
@@ -72,21 +72,21 @@ int main()
     //}
 
     //int z = 0;
-    //for (BVHnode node : tree) {
+    //for (BVHnode_encoded node : tree2) {
     //    cout << "node " << z++ << "-----------------------------" << endl;
-    //    cout << "triangle: " << node.index << " " << node.n << endl;
-    //    cout << "children: " << node.left << " " << node.right << endl;
+    //    cout << "triangle: " << node.triangles.x << " " << node.triangles.y << endl;
+    //    cout << "children: " << node.children.x << " " << node.children.y << endl;
     //    cout << "AA: " << node.AA.x << " " << node.AA.y << " " << node.AA.z << endl;
     //    cout << "BB: " << node.BB.x << " " << node.BB.y << " " << node.BB.z << endl;
     //}
 
-    //int y = 0;
-    //for (Object_encoded o : ooo) {
-    //    cout << "object " << y++ << "------------------------------" << endl;
-    //    cout << "numT: " << o.numT.x << " " << o.numT.y << " " << o.numT.z << endl;
-    //    cout << "color: " << o.color.x << " " << o.color.y << " " << o.color.z << endl;
-    //    cout << "position: " << o.position.x << " " << o.position.y << " " << o.position.z << endl;
-    //}
+    int y = 0;
+    for (Object_encoded o : ooo) {
+        cout << "object " << y++ << "------------------------------" << endl;
+        cout << "numT: " << o.numT.x << " " << o.numT.y << " " << o.numT.z << endl;
+        cout << "color: " << o.color.x << " " << o.color.y << " " << o.color.z << endl;
+        cout << "scale: " << o.scale.x << " " << o.scale.y << " " << o.scale.z << endl;
+    }
 
     //for (Light l : lll) {
     //    cout << "position: " << l.position.x << " " << l.position.y << " " << l.position.z << endl;

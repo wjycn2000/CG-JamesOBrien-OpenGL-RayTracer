@@ -64,7 +64,7 @@ public:
 				o.param2 = glm::vec3(objects[i].material.km, objects[i].material.t, objects[i].material.ior);
 				o.position = objects[i].position;
 				o.rotation = objects[i].rotation;
-				o.scale = objects[i].rotation;
+				o.scale = objects[i].scale;
 				o.numT.x = tree_index;
 				o.numT.y = tree.size() - tree_index;
 				indexes[j].tnum = tree.size() - tree_index;
@@ -78,7 +78,7 @@ public:
 				o.param2 = glm::vec3(objects[i].material.km, objects[i].material.t, objects[i].material.ior);
 				o.position = objects[i].position;
 				o.rotation = objects[i].rotation;
-				o.scale = objects[i].rotation;
+				o.scale = objects[i].scale;
 				o.numT.x = indexes[j].tindex;
 				o.numT.y = indexes[j].tnum;
 				os.push_back(o);

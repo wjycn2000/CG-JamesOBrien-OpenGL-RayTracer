@@ -2,12 +2,14 @@
 #define TRIANGLE_SIZE 6
 #define OBJECT_SIZE 7
 #define LIGHT_SIZE 2
+#define NODE_SIZE 4
 #define INF 114514.0
 #define PI 3.14159265
 
 uniform samplerBuffer triangles;
 uniform samplerBuffer objects;
 uniform samplerBuffer lights;
+uniform samplerBuffer trees;
 
 out vec4 FragColor;
 
@@ -51,6 +53,12 @@ struct Light {
     vec3 color;
 };
 
+struct BVHnode{
+    vec3 AA, BB;
+    int left, right;
+    int index, n;
+};
+
 struct HitRecord {
     int raydepth;
     bool isHit;
@@ -78,6 +86,21 @@ Object getObject(int i) {
 
     
     return o;
+}
+
+BVHnode getBVH(int i) {
+    int offset = i * NODE_SIZE;
+    BVHnode node;
+
+    vec3 children = vec3(texelFetch(trees, offset).xyz);
+    vec3 leaf = vec3(texelFetch(trees, offset+1).xyz);
+    node.left = int(children.x);
+    node.right = int(children.y);
+    node.index = int(leaf.x);
+    node.n = int(leaf.y);
+    node.AA = texelFetch(trees, offset+2).xyz;
+    node.BB = texelFetch(trees, offset+3).xyz;   
+    return node;
 }
 
 Object getObjectOfTriangle(int pos){
@@ -154,36 +177,40 @@ HitRecord intersect(Triangle tr, Ray r, float t0, float t1) {
     hr.raydepth = r.depth;
     float alpha = 1.0f - beta - gamma;
     hr.n = alpha * tr.n1 + beta * tr.n2 + gamma * tr.n3;
-    // hr.n = normalize(cross(p2p1, p3p1)); 
     normalize(hr.n);
-    // if(dot(hr.n, r.d) > 0){
-    //     hr.n = -hr.n;
-    //     hr.isInside = true;
-    // }
     return hr;
 };
 
 HitRecord trace(Ray r, float t0, float t1){
     HitRecord closest;
-    HitRecord hitrecord;
-    Triangle tr;
+    // HitRecord hitrecord;
+    // Triangle tr;
     for (int i = 0; i < objectNum; i++) {
         Object o = getObject(i);
         int first = int(o.numT.x);
         int last = first + int(o.numT.y);
         for(int k = first; k < last; k++){
-            tr  = getTriangle(k, i);    
-            hitrecord = intersect(tr, r, t0, t1);
-            if(hitrecord.isHit){
-                t1 = hitrecord.t;
-                closest = hitrecord;
-                closest.color = o.color;
-                closest.material1 = o.material1;
-                closest.material2 = o.material2;
+            BVHnode node = getBVH(k);
+            if(node.n>0){
+                int l = node.index;
+                int q = l + node.n;
+                for(int s = l; s < q; s++){
+                    Triangle tr  = getTriangle(s, i);
+                    HitRecord hitrecord = intersect(tr, r, t0, t1);
+                    if(hitrecord.isHit){
+                        t1 = hitrecord.t;
+                        closest = hitrecord;
+                        closest.color = o.color;
+                        closest.material1 = o.material1;
+                        closest.material2 = o.material2;
+                    }
+                }
             }
+            
+            
         }
-
     }
+    
     return closest;
 }
 
@@ -231,16 +258,37 @@ void main()
         float rx = o.rotation.x * PI / 180.0f;
         float ry = o.rotation.y * PI / 180.0f;
         float rz = o.rotation.z * PI / 180.0f;
-        float sx = o.scale.x;
-        float sy = o.scale.y;
-        float sz = o.scale.z;
-        mat4 transformMatrice = mat4(
-            sx*cos(ry)*cos(rz), -sy*cos(rx)*sin(rz)+sy*sin(rx)*sin(ry)*cos(rz), sy*sin(rx)*sin(rz)+sy*cos(rx)*sin(ry)*cos(rz), o.position.x,
-            sx*cos(ry)*sin(rz), sy*cos(rx)*cos(rz)+sy*sin(rx)*sin(ry)*sin(rz), -sy*sin(rx)*cos(rz)+sy*cos(rx)*sin(ry)*sin(rz), o.position.y,
-            -sx*sin(ry), sy*sin(rx)*cos(ry), sy*cos(rx)*cos(ry), o.position.z,
-            0, 0, 0, 1.0
+        mat4 translation = mat4(
+            1, 0, 0, o.position.x,
+            0, 1, 0, o.position.y,
+            0, 0, 1, o.position.z,
+            0, 0, 0, 1
         );
-        transformMatrices[g] = transpose(transformMatrice);
+        mat4 rotationZ = mat4(
+            cos(rz), -sin(rz), 0, 0,
+            sin(rz), cos(rz), 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        );
+        mat4 rotationY = mat4(
+            cos(ry), 0, sin(ry), 0,
+            0, 1, 0, 0,
+            -sin(ry), 0, cos(ry), 0,
+            0, 0, 0, 1
+        );
+        mat4 rotationX = mat4(
+            1, 0, 0, 0,
+            0, cos(rx), -sin(rx), 0,
+            0, sin(rx), cos(rx), 0,
+            0, 0, 0, 1
+        );
+        mat4 scaleM = mat4(
+            o.scale.x, 0, 0, 0,
+            0, o.scale.y, 0, 0,
+            0, 0, o.scale.z, 0,
+            0, 0, 0, 1
+        );
+        transformMatrices[g] = transpose(scaleM*rotationZ*rotationY*rotationX*translation);
     } 
     
 
@@ -266,8 +314,7 @@ void main()
     HitRecord hr = trace(ray, hither, INF);
     
     vec3 color = shade(hr);
-    
-    
+
     // 输出最终的颜色
     FragColor = vec4(color, 1.0f);
 };
