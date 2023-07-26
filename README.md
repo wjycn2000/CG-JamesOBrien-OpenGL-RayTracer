@@ -1,1 +1,1 @@
-# CG-JamesOBrien-OpenGL-RayTracer
+# Lab Report
