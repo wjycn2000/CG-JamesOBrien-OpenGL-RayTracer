@@ -156,6 +156,77 @@ float det(vec3 p1, vec3 p2, vec3 p3) {
     return p1.x * (p2.y * p3.z - p3.y * p2.z) + p2.x * (p3.y * p1.z - p1.y * p3.z) + p3.x * (p1.y * p2.z - p2.y * p1.z);
 };
 
+BVHnode getNewAABB(BVHnode node, int objectIndex){
+    BVHnode newNode = node;
+    mat4 transformMatrix = transformMatrices[objectIndex];
+    vec3 vertexes[8];
+    vertexes[0] = vec3(node.AA.x, node.AA.y, node.AA.z);
+    vertexes[1] = vec3(node.AA.x, node.BB.y, node.AA.z);
+    vertexes[2] = vec3(node.AA.x, node.AA.y, node.BB.z);
+    vertexes[3] = vec3(node.AA.x, node.BB.y, node.BB.z);
+    vertexes[4] = vec3(node.BB.x, node.AA.y, node.AA.z);
+    vertexes[5] = vec3(node.BB.x, node.AA.y, node.BB.z);
+    vertexes[6] = vec3(node.BB.x, node.BB.y, node.AA.z);
+    vertexes[7] = vec3(node.BB.x, node.BB.y, node.BB.z);
+    float minx = INF, maxx = -INF, miny = INF, maxy = -INF, minz = INF, maxz = -INF;
+    for(int i =0; i < 8; i++){
+        vertexes[i] = (transformMatrix * vec4(vertexes[i], 1.0f)).xyz;
+    }
+    for(int i = 0; i < 8; i++){
+        if(vertexes[i].x < minx) minx = vertexes[i].x;
+        if(vertexes[i].x > maxx) maxx = vertexes[i].x;
+        if(vertexes[i].y < miny) miny = vertexes[i].y;
+        if(vertexes[i].y > maxy) maxy = vertexes[i].y;
+        if(vertexes[i].z < minz) minz = vertexes[i].z;
+        if(vertexes[i].z > maxz) maxz = vertexes[i].z;
+    }
+    newNode.AA = vec3(minx, miny, minz);
+    newNode.BB = vec3(maxx, maxy, maxz);
+    return newNode;
+}
+
+bool hitAABB(Ray r, BVHnode node, int objectIndex){
+    float txmin, txmax, tymin, tymax, tzmin, tzmax;
+    float a;
+    node = getNewAABB(node, objectIndex);
+    //x-direction
+    a = 1/r.d.x;
+    if(a>=0){
+        txmin = a*(node.AA.x - r.e.x);
+        txmax = a*(node.BB.x - r.e.x);
+    }
+    else{
+        txmin = a*(node.BB.x - r.e.x);
+        txmax = a*(node.AA.x - r.e.x);
+    }
+    //y-direction
+    a = 1/r.d.y;
+    if(a>=0){
+        tymin = a*(node.AA.y - r.e.y);
+        tymax = a*(node.BB.y - r.e.y);
+    }
+    else{
+        tymin = a*(node.BB.y - r.e.y);
+        tymax = a*(node.AA.y - r.e.y);
+    }
+    //z-direction
+    a = 1/r.d.z;
+    if(a>=0){
+        tzmin = a*(node.AA.z - r.e.z);
+        tzmax = a*(node.BB.z - r.e.z);
+    }
+    else{
+        tzmin = a*(node.BB.z - r.e.z);
+        tzmax = a*(node.AA.z - r.e.z);
+    }
+    //see if they have overlap
+    if(txmin>tymax || tymin>txmax || txmin>tzmax || tzmin>txmax || tzmin>tymax || tymin>tzmax){
+        return false;
+    }else{
+        return true;
+    }
+}
+
 HitRecord intersect(Triangle tr, Ray r, float t0, float t1) { 
     HitRecord hr;
     hr.isHit = false;
@@ -181,36 +252,88 @@ HitRecord intersect(Triangle tr, Ray r, float t0, float t1) {
     return hr;
 };
 
+HitRecord hitTriangles(Ray r, float t0, float t1, int left, int right, int objectIndex){
+    HitRecord hr;
+    hr.isHit = false;
+    hr.t = INF;
+    for(int i=left;i<=right;i++){
+        Triangle tr = getTriangle(i, objectIndex);
+        HitRecord hitrecord = intersect(tr, r, t0, t1);
+        if(hitrecord.isHit){
+            t1 = hitrecord.t;
+            hr = hitrecord;
+        }
+    }
+    return hr;
+};
+
+HitRecord hitBVH(Ray r, float t0, float t1, int objectIndex){
+    HitRecord hr;
+    hr.isHit=false;
+    hr.t=INF;
+
+    Object o = getObject(objectIndex);
+    int root = int(o.numT.x);
+
+    // debug
+    // int end = root + int(o.numT.y);
+    // for(int i = root; i<end;i++){
+    //     BVHnode node = getBVH(i);
+    //     if(node.n>0){
+    //         HitRecord hitRecord = hitTriangles(r, t0, t1, node.index, node.index+node.n-1, objectIndex);
+    //         if(hitRecord.isHit && hitRecord.t<hr.t){
+    //             hr=hitRecord;
+    //         }
+    //     }
+    // }
+    // return hr;
+
+    int stack[256];
+    int sp=0;
+
+    stack[sp++] = root;
+    while(sp>0){
+        int top = stack[--sp];
+        BVHnode node = getBVH(top);
+
+        //leaf node
+        if(node.n>0){
+            int left = node.index;
+            int right = node.index + node.n - 1;
+            HitRecord hrt = hitTriangles(r, t0, t1, left, right, objectIndex);
+            if(hrt.isHit && hrt.t<hr.t){
+                hr = hrt;
+            }
+            continue;
+        }
+
+        BVHnode leftChild = getBVH(node.left);
+        bool leftHit = hitAABB(r, leftChild, objectIndex);
+        BVHnode rightChild = getBVH(node.right);
+        bool rightHit = hitAABB(r, rightChild, objectIndex);
+        if(leftHit) stack[sp++] = node.left;
+        if(rightHit) stack[sp++] = node.right;
+    }
+
+    return hr;
+};
+
 HitRecord trace(Ray r, float t0, float t1){
     HitRecord closest;
+    closest.isHit=false;
+    closest.t=INF;
     // HitRecord hitrecord;
     // Triangle tr;
     for (int i = 0; i < objectNum; i++) {
         Object o = getObject(i);
-        int first = int(o.numT.x);
-        int last = first + int(o.numT.y);
-        for(int k = first; k < last; k++){
-            BVHnode node = getBVH(k);
-            if(node.n>0){
-                int l = node.index;
-                int q = l + node.n;
-                for(int s = l; s < q; s++){
-                    Triangle tr  = getTriangle(s, i);
-                    HitRecord hitrecord = intersect(tr, r, t0, t1);
-                    if(hitrecord.isHit){
-                        t1 = hitrecord.t;
-                        closest = hitrecord;
-                        closest.color = o.color;
-                        closest.material1 = o.material1;
-                        closest.material2 = o.material2;
-                    }
-                }
-            }
-            
-            
+        HitRecord hit = hitBVH(r, t0, t1, i);
+        if(hit.isHit && hit.t<closest.t){
+            closest = hit;
+            closest.color = o.color;
+            closest.material1 = o.material1;
+            closest.material2 = o.material2;
         }
     }
-    
     return closest;
 }
 

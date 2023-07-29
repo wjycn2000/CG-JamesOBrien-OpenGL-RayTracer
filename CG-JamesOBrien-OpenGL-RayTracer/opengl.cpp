@@ -41,6 +41,11 @@ int main()
     Scene scene;
     Material m1(glm::vec3(0.9f, 0.3f, 0.1f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
     Material m2(glm::vec3(0.9f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
+    Model cubeModel("D:\\3DResources\\cube.obj");
+    Object cube1(&cubeModel, m1, glm::vec3(-4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    Object cube2(&cubeModel, m2, glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    scene.addObject(cube1);
+    scene.addObject(cube2);
     Model model1("D:\\3DResources\\chorus.obj");
     //Model model2("D:\\3DResources\\plane.obj");
     Object chorus1(&model1, m1, glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
@@ -80,13 +85,13 @@ int main()
     //    cout << "BB: " << node.BB.x << " " << node.BB.y << " " << node.BB.z << endl;
     //}
 
-    int y = 0;
-    for (Object_encoded o : ooo) {
-        cout << "object " << y++ << "------------------------------" << endl;
-        cout << "numT: " << o.numT.x << " " << o.numT.y << " " << o.numT.z << endl;
-        cout << "color: " << o.color.x << " " << o.color.y << " " << o.color.z << endl;
-        cout << "scale: " << o.scale.x << " " << o.scale.y << " " << o.scale.z << endl;
-    }
+    //int y = 0;
+    //for (Object_encoded o : ooo) {
+    //    cout << "object " << y++ << "------------------------------" << endl;
+    //    cout << "numT: " << o.numT.x << " " << o.numT.y << " " << o.numT.z << endl;
+    //    cout << "color: " << o.color.x << " " << o.color.y << " " << o.color.z << endl;
+    //    cout << "scale: " << o.scale.x << " " << o.scale.y << " " << o.scale.z << endl;
+    //}
 
     //for (Light l : lll) {
     //    cout << "position: " << l.position.x << " " << l.position.y << " " << l.position.z << endl;

@@ -130,7 +130,7 @@ public:
         bvhnodes[index].BB = glm::vec3(maxx, maxy, maxz);
 
         //if too few triangles in a node, create leaf
-        if (r - l + 1 < n) {
+        if (r - l + 1 <= n) {
             bvhnodes[index].index = l;
             bvhnodes[index].n = r - l + 1;
             return index;
