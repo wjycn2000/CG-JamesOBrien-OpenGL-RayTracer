@@ -42,13 +42,13 @@ struct Material {
         ior = _ior;
     }
 };
-
+class Object;
 class Model
 {
 public:
     // model data 
     vector<Mesh> meshes;
-
+    vector<Object*> objects;
     unsigned int numT;
 
     // constructor, expects a filepath to a 3D model.
@@ -74,6 +74,95 @@ public:
             }
         }
         numT = triangles.size() - numTStart;
+    }
+
+    int genBVHtree(vector<Triangle>& triangles, vector<BVHnode>& bvhnodes, int l, int r, int n) {
+        if (l > r) return 0;
+
+        //get index, to access by index
+        bvhnodes.push_back(BVHnode());
+        int index = bvhnodes.size() - 1;
+
+        //initialize
+        bvhnodes[index].left = bvhnodes[index].right = -1;
+        bvhnodes[index].n = bvhnodes[index].index = -1;
+        bvhnodes[index].AA = glm::vec3(-INFINITY, -INFINITY, -INFINITY);
+        bvhnodes[index].BB = glm::vec3(INFINITY, INFINITY, INFINITY);
+
+        //compute AABB
+        GLfloat minx = INFINITY, maxx = -INFINITY, miny = INFINITY, maxy=-INFINITY, minz=INFINITY, maxz=-INFINITY;
+        for (unsigned int i = l; i <= r; i++) {
+            glm::vec3 p1 = triangles[i].p1;
+            glm::vec3 p2 = triangles[i].p2;
+            glm::vec3 p3 = triangles[i].p3;
+
+            //minx
+            if (p1.x < minx) minx = p1.x;
+            if (p2.x < minx) minx = p2.x;
+            if (p3.x < minx) minx = p3.x;
+
+            //maxx
+            if (p1.x > maxx) maxx = p1.x;
+            if (p2.x > maxx) maxx = p2.x;
+            if (p3.x > maxx) maxx = p3.x;
+
+            //miny
+            if (p1.y < miny) miny = p1.y;
+            if (p2.y < miny) miny = p2.y;
+            if (p3.y < miny) miny = p3.y;
+
+            //maxy
+            if (p1.y > maxy) maxy = p1.y;
+            if (p2.y > maxy) maxy = p2.y;
+            if (p3.y > maxy) maxy = p3.y;
+
+            //minz
+            if (p1.z < minz) minz = p1.z;
+            if (p2.z < minz) minz = p2.z;
+            if (p3.z < minz) minz = p3.z;
+
+            //maxz
+            if (p1.z > maxz) maxz = p1.z;
+            if (p2.z > maxz) maxz = p2.z;
+            if (p3.z > maxz) maxz = p3.z;
+        }
+        bvhnodes[index].AA = glm::vec3(minx, miny, minz);
+        bvhnodes[index].BB = glm::vec3(maxx, maxy, maxz);
+
+        //if too few triangles in a node, create leaf
+        if (r - l + 1 <= n) {
+            bvhnodes[index].index = l;
+            bvhnodes[index].n = r - l + 1;
+            return index;
+        }
+
+
+
+        //sort
+        auto begin = std::next(triangles.begin(), l);
+        auto end = std::next(triangles.begin(), r);
+        float xrange = maxx - minx;
+        float yrange = maxy - miny;
+        float zrange = maxz - minz;
+        float maxrange = std::max({ xrange, yrange, zrange });
+        if (maxrange == xrange) {
+            sort(begin, end, [](Triangle t1, Triangle t2) {return t1.p1.x < t2.p1.x; });
+        }
+        else if (maxrange == yrange) {
+            sort(begin, end, [](Triangle t1, Triangle t2) {return t1.p1.y < t2.p1.y; });
+        }
+        else {
+            sort(begin, end, [](Triangle t1, Triangle t2) {return t1.p1.z < t2.p1.z; });
+        }
+
+
+        //create child nodes
+        int mid = (l + r) / 2;
+        int left = genBVHtree(triangles, bvhnodes, l, mid, n);
+        int right = genBVHtree(triangles, bvhnodes, mid + 1, r, n);
+        bvhnodes[index].left = left;
+        bvhnodes[index].right = right;
+        return index;
     }
 
 private:
@@ -169,6 +258,7 @@ public:
         rotation = _rotation;
         scale = _scale;
         material = _m;
+        model->objects.push_back(this);
     }
 };
 #endif

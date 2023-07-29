@@ -41,41 +41,64 @@ int main()
     Scene scene;
     Material m1(glm::vec3(0.9f, 0.3f, 0.1f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
     Material m2(glm::vec3(0.9f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
+    Model cubeModel("D:\\3DResources\\cube.obj");
+    Object cube1(&cubeModel, m1, glm::vec3(-4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    Object cube2(&cubeModel, m2, glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    scene.addObject(cube1);
+    scene.addObject(cube2);
     Model model1("D:\\3DResources\\chorus.obj");
-    Model model2("D:\\3DResources\\plane.obj");
-    Object chorus1(&model1, m1, glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f));
-    Object chorus2(&model1, m2, glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
-    Object plane1(&model2, m1, glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(2.0f));
+    //Model model2("D:\\3DResources\\plane.obj");
+    Object chorus1(&model1, m1, glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    Object chorus2(&model1, m2, glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    //Object plane(&model1, m2, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(2.0f));
+    //Object plane2(&model2, m2, glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(2.0f));
     Light pointLight(glm::vec3(-5.0f, 5.0f, 5.0f));
-    Light pointLight2(glm::vec3(5.0f, 5.0f, 5.0f));
+    //Light pointLight2(glm::vec3(5.0f, 5.0f, 5.0f));
     scene.addObject(chorus1);
     scene.addObject(chorus2);
-    //scene.addObject(plane1);
+    //scene.addObject(plane);
+    //scene.addObject(plane2);
     scene.addLight(pointLight);
     //scene.addLight(pointLight2);
     vector<Triangle> ttt;
     vector<Object_encoded> ooo;
     vector<Light> lll;
-    scene.generateData(ttt, ooo, lll);
+    vector<BVHnode> tree;
+    vector<BVHnode_encoded> tree2;
+    scene.generateData(ttt, ooo, tree, lll);
+    converTree(tree, tree2);
 
-    /*for (Triangle t : ttt) {
-        cout << "f" << endl;
-        cout << "p1: " << t.p1.x << " " << t.p1.y << " " << t.p1.z << endl;
-        cout << "p2: " << t.p2.x << " " << t.p2.y << " " << t.p2.z << endl;
-        cout << "p3: " << t.p3.x << " " << t.p3.y << " " << t.p3.z << endl;
-    }
+    //int x = 0;
+    //for (Triangle t : ttt) {
+    //    cout << x++ << endl;
+    //    cout << "p1: " << t.p1.x << " " << t.p1.y << " " << t.p1.z << endl;
+    //    cout << "p2: " << t.p2.x << " " << t.p2.y << " " << t.p2.z << endl;
+    //    cout << "p3: " << t.p3.x << " " << t.p3.y << " " << t.p3.z << endl;
+    //}
 
-    for (Object_encoded o : ooo) {
-        cout << "numT: " << o.numT.x << " " << o.numT.y << " " << o.numT.z << endl;
-        cout << "color: " << o.color.x << " " << o.color.y << " " << o.color.z << endl;
-    }
+    //int z = 0;
+    //for (BVHnode_encoded node : tree2) {
+    //    cout << "node " << z++ << "-----------------------------" << endl;
+    //    cout << "triangle: " << node.triangles.x << " " << node.triangles.y << endl;
+    //    cout << "children: " << node.children.x << " " << node.children.y << endl;
+    //    cout << "AA: " << node.AA.x << " " << node.AA.y << " " << node.AA.z << endl;
+    //    cout << "BB: " << node.BB.x << " " << node.BB.y << " " << node.BB.z << endl;
+    //}
 
-    for (Light l : lll) {
-        cout << "position: " << l.position.x << " " << l.position.y << " " << l.position.z << endl;
-        cout << "color: " << l.color.x << " " << l.color.y << " " << l.color.z << endl;
-    }
+    //int y = 0;
+    //for (Object_encoded o : ooo) {
+    //    cout << "object " << y++ << "------------------------------" << endl;
+    //    cout << "numT: " << o.numT.x << " " << o.numT.y << " " << o.numT.z << endl;
+    //    cout << "color: " << o.color.x << " " << o.color.y << " " << o.color.z << endl;
+    //    cout << "scale: " << o.scale.x << " " << o.scale.y << " " << o.scale.z << endl;
+    //}
 
-    return 0;*/
+    //for (Light l : lll) {
+    //    cout << "position: " << l.position.x << " " << l.position.y << " " << l.position.z << endl;
+    //    cout << "color: " << l.color.x << " " << l.color.y << " " << l.color.z << endl;
+    //}
+
+    //return 0;
 
     // glfw: initialize and configure
     // ------------------------------
@@ -139,7 +162,7 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    GLuint tbo_t, tbo_o, tbo_l;
+    GLuint tbo_t, tbo_o, tbo_l, tbo_tree;
     glGenBuffers(1, &tbo_t);
     glBindBuffer(GL_TEXTURE_BUFFER, tbo_t);
     glBufferData(GL_TEXTURE_BUFFER, ttt.size() * sizeof(Triangle), &ttt[0], GL_STATIC_DRAW);
@@ -149,19 +172,24 @@ int main()
     glGenBuffers(1, &tbo_l);
     glBindBuffer(GL_TEXTURE_BUFFER, tbo_l);
     glBufferData(GL_TEXTURE_BUFFER, lll.size() * sizeof(Light), &lll[0], GL_STATIC_DRAW);
+    glGenBuffers(1, &tbo_tree);
+    glBindBuffer(GL_TEXTURE_BUFFER, tbo_tree);
+    glBufferData(GL_TEXTURE_BUFFER, tree2.size() * sizeof(BVHnode_encoded), &tree2[0], GL_STATIC_DRAW);
 
-    GLuint tex_t, tex_o, tex_l;
+    GLuint tex_t, tex_o, tex_l, tex_tree;
     glGenTextures(1, &tex_t);
     glGenTextures(1, &tex_o);
     glGenTextures(1, &tex_l);
+    glGenTextures(1, &tex_tree);
     
 
     // build and compile shader program
-    Shader shader("D:\\OpenGL\\shaders\\raytracing.vs", "D:\\OpenGL\\shaders\\raytracing.fs");
+    Shader shader("raytracing.vert", "raytracing.frag");
     shader.use();
     shader.setInt("triangles", 0);
     shader.setInt("objects", 1);
     shader.setInt("lights", 2);
+    shader.setInt("trees", 3);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_BUFFER, tex_t);
@@ -172,6 +200,9 @@ int main()
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_BUFFER, tex_l);
     glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, tbo_l);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_BUFFER, tex_tree);
+    glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, tbo_tree);
     
 
     

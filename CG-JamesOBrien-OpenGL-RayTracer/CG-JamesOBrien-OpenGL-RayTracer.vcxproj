@@ -28,6 +28,10 @@
     <ClCompile Include="..\..\..\迅雷下载\glad\src\glad.c" />
     <ClCompile Include="opengl.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="raytracing.frag" />
+    <None Include="raytracing.vert" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
