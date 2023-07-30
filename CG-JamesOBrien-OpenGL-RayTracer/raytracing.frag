@@ -5,6 +5,7 @@
 #define NODE_SIZE 4
 #define INF 114514.0
 #define PI 3.14159265
+#define SAMPLES 9
 
 uniform samplerBuffer triangles;
 uniform samplerBuffer objects;
@@ -457,9 +458,9 @@ void main()
 
     vec3 accumulatedColor;
 
-    for(int i = 1; i <= 4; i++){
+    for(int i = 1 ; i <= SAMPLES; i++){
 
-        float noi = noise(vec2(u1/i, v1/i)) - 0.5;
+        float noi = noise(vec2(u1*i, v1*i)) - 0.5;
         float newu1 = u1 + (r - l)*noi/resolution.x;
         float newv1 = v1 + (t - b)*noi/resolution.y;
         Ray ray;
@@ -470,7 +471,7 @@ void main()
         accumulatedColor += shade(hr);
     }
 
-    vec3 color = accumulatedColor/4;
+    vec3 color = accumulatedColor/SAMPLES;
      
     
     // Ray ray;

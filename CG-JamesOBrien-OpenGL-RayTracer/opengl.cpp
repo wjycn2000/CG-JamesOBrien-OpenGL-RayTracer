@@ -16,6 +16,7 @@
 const float MAX_FPS = 60.0f;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
 // screen settings
@@ -39,27 +40,38 @@ glm::vec3 up(0.0f, 1.0f, 0.0f);
 int main()
 {
     Scene scene;
-    Material m1(glm::vec3(0.6f, 0.6f, 0.6f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
-    Material m2(glm::vec3(0.9f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
+    Material grey(glm::vec3(0.6f, 0.6f, 0.6f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
+    Material white(glm::vec3(1.0f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
+    Material red(glm::vec3(1.0f, 0.1f, 0.1f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
+    Material green(glm::vec3(0.1f, 1.0f, 0.1f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
+    Material blue(glm::vec3(0.1f, 0.1f, 1.0f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
+    //scene2 bunny
+    //Model bunny_model("D:\\3DResources\\alarm.obj");
+    //Object bunny(&bunny_model, green, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f));
+    //scene.addObject(bunny);
     Model cubeModel("D:\\3DResources\\cube.obj");
-    Object cube1(&cubeModel, m1, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-    //Object cube2(&cubeModel, m2, glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    Model planeModel("D:\\3DResources\\plane.obj");
+    Object cube1(&cubeModel, red, glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(45.0f, 20.0f, -30.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    Object cube2(&cubeModel, green, glm::vec3(-3.0f, 2.0f, 0.0f), glm::vec3(4.0f, 56.0f, 70.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    Object cube3(&cubeModel, blue, glm::vec3(3.0f, 2.0f, 0.0f), glm::vec3(-21.0f, 24.0f, 45.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    Object plane(&cubeModel, white, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(5.0f, 5.0f, 0.1f));
     scene.addObject(cube1);
-    //scene.addObject(cube2);
-    Model model1("D:\\3DResources\\torus.obj");
+    scene.addObject(cube2);
+    scene.addObject(cube3);
+    scene.addObject(plane);
     //Model model2("D:\\3DResources\\plane.obj");
-    Object torus1(&model1, m1, glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-    Object torus2(&model1, m2, glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    //Object torus1(&model1, red, glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    //Object torus2(&model1, blue, glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     //Object plane(&model1, m2, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(2.0f));
     //Object plane2(&model2, m2, glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(2.0f));
     Light pointLight(glm::vec3(-5.0f, 5.0f, 5.0f));
-    //Light pointLight2(glm::vec3(5.0f, 5.0f, 5.0f));
+    Light pointLight2(glm::vec3(5.0f, 5.0f, 5.0f));
     //scene.addObject(torus1);
     //scene.addObject(torus2);
     //scene.addObject(plane);
     //scene.addObject(plane2);
     scene.addLight(pointLight);
-    //scene.addLight(pointLight2);
+    scene.addLight(pointLight2);
     vector<Triangle> ttt;
     vector<Object_encoded> ooo;
     vector<Light> lll;
@@ -122,6 +134,7 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -144,7 +157,7 @@ int main()
     };
 
 
-    glm::vec3 bcolor(1.0f, 1.0f, 1.0f);
+    glm::vec3 bcolor(0.5f);
     glm::vec3 light1(-10, 10, 10);
     glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
     float shadowbias = 0.0001f;
@@ -215,6 +228,7 @@ int main()
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+        cout << 1 / deltaTime << endl;
 
         double diff = 1.0 / MAX_FPS - deltaTime;
 
@@ -290,4 +304,16 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    float xo = static_cast<float>(yoffset);
+    float sensitivity = 0.1f;
+    xo *= sensitivity;
+    glm::vec3 eyeDirection = glm::normalize(at - eye);
+    eye = eye + xo * eyeDirection;
+    float l = glm::length(at - eye);
+    if (l <= 2.0f) {
+        eye = at - l * eyeDirection;
+    }
 }
