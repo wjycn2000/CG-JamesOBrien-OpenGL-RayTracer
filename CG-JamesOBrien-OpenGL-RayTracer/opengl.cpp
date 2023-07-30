@@ -39,23 +39,23 @@ glm::vec3 up(0.0f, 1.0f, 0.0f);
 int main()
 {
     Scene scene;
-    Material m1(glm::vec3(0.9f, 0.3f, 0.1f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
+    Material m1(glm::vec3(0.6f, 0.6f, 0.6f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
     Material m2(glm::vec3(0.9f), 0.75f, 0.5f, 3.8f, 0.2f, 0.0f, 0.0f);
     Model cubeModel("D:\\3DResources\\cube.obj");
-    Object cube1(&cubeModel, m1, glm::vec3(-4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-    Object cube2(&cubeModel, m2, glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    Object cube1(&cubeModel, m1, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    //Object cube2(&cubeModel, m2, glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     scene.addObject(cube1);
-    scene.addObject(cube2);
-    Model model1("D:\\3DResources\\chorus.obj");
+    //scene.addObject(cube2);
+    Model model1("D:\\3DResources\\torus.obj");
     //Model model2("D:\\3DResources\\plane.obj");
-    Object chorus1(&model1, m1, glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-    Object chorus2(&model1, m2, glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    Object torus1(&model1, m1, glm::vec3(-0.5f, 0.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    Object torus2(&model1, m2, glm::vec3(0.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     //Object plane(&model1, m2, glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(2.0f));
     //Object plane2(&model2, m2, glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(90.0f, 0.0f, 0.0f), glm::vec3(2.0f));
     Light pointLight(glm::vec3(-5.0f, 5.0f, 5.0f));
     //Light pointLight2(glm::vec3(5.0f, 5.0f, 5.0f));
-    scene.addObject(chorus1);
-    scene.addObject(chorus2);
+    //scene.addObject(torus1);
+    //scene.addObject(torus2);
     //scene.addObject(plane);
     //scene.addObject(plane2);
     scene.addLight(pointLight);
@@ -144,7 +144,7 @@ int main()
     };
 
 
-    glm::vec3 bcolor(0.5f, 0.5f, 0.5f);
+    glm::vec3 bcolor(1.0f, 1.0f, 1.0f);
     glm::vec3 light1(-10, 10, 10);
     glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
     float shadowbias = 0.0001f;

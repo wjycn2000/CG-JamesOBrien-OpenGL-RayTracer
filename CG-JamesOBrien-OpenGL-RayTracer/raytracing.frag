@@ -72,6 +72,30 @@ struct HitRecord {
     vec3 material2; //km, t, ior
 };
 
+ 
+// 伪随机数生成函数
+float random(vec2 st){
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+// 分形布朗运动
+float noise(vec2 st) {
+    vec2 i = floor(st);
+    vec2 f = fract(st);
+
+    // 四个角的随机数
+    float a = random(i);
+    float b = random(i + vec2(1.0, 0.0));
+    float c = random(i + vec2(0.0, 1.0));
+    float d = random(i + vec2(1.0, 1.0));
+
+    // 双线性插值
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+}
+
+
+
 Object getObject(int i) {
     int offset = i * OBJECT_SIZE;
     Object o;
@@ -430,13 +454,32 @@ void main()
     float r = horizontalHalf;
     float u1 = l + (r - l)*(i + 0.5)/resolution.x;
     float v1 = b + (t - b)*(j + 0.5)/resolution.y;
-    Ray ray;
-    ray.e = eye;
-    ray.d = normalize(-d*w + u1*u + v1*v);
 
-    HitRecord hr = trace(ray, hither, INF);
+    vec3 accumulatedColor;
+
+    for(int i = 1; i <= 4; i++){
+
+        float noi = noise(vec2(u1/i, v1/i)) - 0.5;
+        float newu1 = u1 + (r - l)*noi/resolution.x;
+        float newv1 = v1 + (t - b)*noi/resolution.y;
+        Ray ray;
+        ray.e = eye;
+        ray.d = normalize(-d*w + newu1*u + newv1*v);
+        ray.d = normalize(-d*w + newu1*u + newv1*v);
+        HitRecord hr = trace(ray, hither, INF);
+        accumulatedColor += shade(hr);
+    }
+
+    vec3 color = accumulatedColor/4;
+     
     
-    vec3 color = shade(hr);
+    // Ray ray;
+    // ray.e = eye;
+    // ray.d = normalize(-d*w + u1*u + v1*v);
+
+    // HitRecord hr = trace(ray, hither, INF);
+    
+    // vec3 color = shade(hr);
 
     // 输出最终的颜色
     FragColor = vec4(color, 1.0f);
