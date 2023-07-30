@@ -17,7 +17,7 @@ Now I can run my program. In my example, there are two toruses in different colo
 ###### accelerating structure --BVH tree
 Since I am developing a realtime program, I need to generate a single image in less than 20 milliseconds. Traversing all triangles to see if they intersect the rays is too expensive, failing to produce smooth realtime experience. That's why I decide to use BVH tree. We discussed about BSP tree in class, but I think it's more difficult to implement. BVH tree uses Axis-Aligned Bounding Box to surround objects. If the box is not hit, the objects inside will certainly intersect with rays. In my program, for each object, I put triangles into its BVH tree, which is stored in an array. When I want to know which triangle a ray hit, I traverse each object and call a hitBVH function on that object. In this function, triangles inside boxes that miss the ray will not be visited, which saves a lot time. Now I gain great efficiency improvment. I can also use a tree to organize the whole scene, but that's not necessary because I don't need a lot of objects in the scene right now.
 
-###### supersampling
+###### anti-aliasing
 The extra time given by using BVH tree allows me to do more computation and improve the quality. We discussed about aliasing in class and several ways to overcome the problem. I used "distributed" raytracing, which means I send multiple rays (jittered) for a single pixel and average the results together. 
 
 ###### no recursive fucntion in glsl...
